@@ -29,13 +29,14 @@ namespace OculusTest
         private Vector3[] pointsToDraw;
 
         [Range(1,10)]
-        [SerializeField]private float speed = 5f;
+        [SerializeField]private float speed = 1f;
         
 
         public GameObject point1;
         public GameObject point2;
         public GameObject point3;
         public GameObject point4;
+        Ray ray;
         float timestep;
         private void Awake()
         {
@@ -49,6 +50,7 @@ namespace OculusTest
             // RenderArc();
             pointsToDraw = new Vector3[arcParts];
             lineRenderer.positionCount = arcParts;
+            ray.origin = lineRenderer.transform.position;
             Draw();
 
         }
@@ -70,6 +72,7 @@ namespace OculusTest
             {
                 lineRenderer.gameObject.SetActive(false);
                 this.transform.localPosition = new Vector3(hitPoint.x, transform.localPosition.y, hitPoint.z); //y needs to be same as the player.
+                ray.origin = this.transform.position + lineRenderer.transform.localPosition;
             }
         }
         /// <summary>
@@ -258,13 +261,23 @@ namespace OculusTest
         /// </summary>
         private void UseRaycast()
         {
-            Debug.DrawRay(lineRenderer.transform.localPosition, lineRenderer.transform.forward, Color.green, 300f);
-            if (Physics.Raycast(lineRenderer.transform.localPosition,lineRenderer.transform.forward,out hitInfo,300f))
+            Debug.DrawRay(ray.origin, lineRenderer.transform.forward, Color.green, 300f);
+                        
+            ray.direction = lineRenderer.transform.forward;
+
+            if (Physics.Raycast(ray, out hitInfo, 400f))
             {
                 hitPoint = hitInfo.point;
                 Debug.Log("hitpoint " + hitPoint);
-                DrawQuadraticCurve(lineRenderer.transform.localPosition, hitPoint, CalculateThirdPoint(lineRenderer.transform.localPosition,hitInfo.point));              
+                DrawQuadraticCurve(lineRenderer.transform.localPosition, hitPoint, CalculateThirdPoint(transform.localPosition, hitInfo.point));
             }
+
+            //if (Physics.Raycast(transform.localPosition, lineRenderer.transform.forward, out hitInfo, 300f))
+            //{
+            //    hitPoint = hitInfo.point;
+            //    Debug.Log("hitpoint " + hitPoint);
+            //    DrawQuadraticCurve(transform.localPosition, hitPoint, CalculateThirdPoint(lineRenderer.transform.localPosition, hitInfo.point));
+            //}
             else
             {
                 lineRenderer.gameObject.SetActive(false);
