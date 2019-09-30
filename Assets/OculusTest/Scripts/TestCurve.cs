@@ -57,15 +57,19 @@ namespace OculusTest
         private void FixedUpdate()
         {
             float y = Input.GetAxis("Vertical");
+            float x = Input.GetAxis("Horizontal");
             if (y!= 0)
             {
                 lineRenderer.transform.Rotate(lineRenderer.transform.localRotation.x + y*speed, lineRenderer.transform.localRotation.y, lineRenderer.transform.localRotation.z); //Test raycast by rotation
             }
+            if (x != 0)
+            {
+                transform.Rotate(transform.localRotation.x,transform.localRotation.y + x*speed,transform.localRotation.z); //Added rotation for Player
+            }
             if (Input.GetMouseButton(0))
             {
                 if(!lineRenderer.gameObject.activeSelf)
-                    lineRenderer.gameObject.SetActive(true);
-                
+                    lineRenderer.gameObject.SetActive(true);                
                 Draw();
             }
             else if (Input.GetMouseButtonUp(0))
@@ -218,7 +222,7 @@ namespace OculusTest
         private Vector3 CalculateQuadBezierCurve(Vector3 point1, Vector3 point2,Vector3 point3, float t)
         {
             float x = 1 - t;
-            return x *x * point1 + 2 * t * x * point2 + t * t * point3; //quad formula P= (1-t)^2p0 + 2(1-t)tp1 + t^p2
+            return x *x * point1 + 2 * t * x * point2 + t * t * point3; //quad formula P= (1-t)^2p0 + 2(1-t)tp1 + t^2p2
         }
         /// <summary>
         /// returns a third control point. Uses a mean formula. and adds it using speed with world up vector
@@ -271,13 +275,6 @@ namespace OculusTest
                 Debug.Log("hitpoint " + hitPoint);
                 DrawQuadraticCurve(lineRenderer.transform.localPosition, hitPoint, CalculateThirdPoint(transform.localPosition, hitInfo.point));
             }
-
-            //if (Physics.Raycast(transform.localPosition, lineRenderer.transform.forward, out hitInfo, 300f))
-            //{
-            //    hitPoint = hitInfo.point;
-            //    Debug.Log("hitpoint " + hitPoint);
-            //    DrawQuadraticCurve(transform.localPosition, hitPoint, CalculateThirdPoint(lineRenderer.transform.localPosition, hitInfo.point));
-            //}
             else
             {
                 lineRenderer.gameObject.SetActive(false);
